@@ -2,8 +2,13 @@ import getpass
 import os.path
 import time
 
-import datadog
-import yaml
+try:
+    import datadog
+    import yaml
+    MODULES_LOADED = True
+except ImportError:
+    MODULES_LOADED = False
+
 
 try:
     # Ansible v2
@@ -17,6 +22,14 @@ except ImportError:
 
 class CallbackModule(CallbackBase):
     def __init__(self):
+
+        if not MODULES_LOADED:
+            print("""
+            Datadog callback disabled.
+
+            Make sure to install the necessary libraries.
+            """)
+            self.disabled = True
 
         self._playbook_name = None
         self._start_time = time.time()
